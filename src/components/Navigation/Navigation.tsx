@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { sortables } from "../../../util/constants";
-import { ILimit, INavigation } from "../../../util/types";
+import { sortables } from "../../util/constants";
+import { ILimit, INavigation } from "../../util/types";
 import "./Navigation.css";
 
 function Navigation({isFirstPage, isLastPage, handleOffset, handleLimit, currentLimit, handleSortBy, handleSearch }: INavigation) {

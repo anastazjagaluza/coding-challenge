@@ -4,6 +4,7 @@ export interface IPokeData {
     weight: string;
     abilities: string;
     image: string;
+    showDetail?: Function;
 }
 
 export interface ICard {

@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import './App.css';
 import Card from "./components/Card/Card";
-import Navigation from './components/Card/Navigation/Navigation';
+import Detail from './components/Detail/Detail';
+import Navigation from './components/Navigation/Navigation';
 import { sortables } from './util/constants';
 import { ILimit, IPokeData } from "./util/types";
 
@@ -13,6 +14,7 @@ function App() {
   const [searchValue, setSearchValue] = useState<string>();
   const [searchCategory, setSearchCategory] = useState<string>();
   const [pokeData, setPokeData] = useState<IPokeData[]>([]);
+  const [detail, setDetail] = useState<[] | null>(null);
   const fetchUrl = "https://pokeapi.co/api/v2/pokemon";
 
   /**
@@ -87,6 +89,7 @@ function App() {
     }
   }, [searchValue, searchCategory])
   
+
   /**
    * In order to preserve the user passed values for limit, offset or search, the need to be picked up from the params.
    */
@@ -99,21 +102,13 @@ function App() {
       const limit = Number(params.get("limit"));
       if (limit === 10 || limit === 20 || limit === 50) {
         setLimit(limit);
-      } 
-      // else {
-      //   // clear
-      //   window.history.pushState({}, "", "/");
-      // }
+      }
       
       // apply offset from params
       const offset = Number(params.get("offset"));
       if (offset != null) {
         setOffset(offset);
-      } 
-      // else {
-      //   // clear
-      //   window.history.pushState({}, "", "/");
-      // }
+      }
       
       // apply search from params, both have to be present to work
       const searchValue = params.get("search");
@@ -123,11 +118,7 @@ function App() {
       if (searchValue != null && searchCategory != null && limit === null && offset === null) {
         setSearchCategory(searchCategory);
         setSearchValue(searchValue);
-      } 
-      // else {
-      //   // clear
-      //   window.history.pushState({}, "", "/");
-      // }
+      }
       
       const sortBy = params.get("sortBy");
       if (sortBy != null && (sortables.includes(sortBy))) {
@@ -199,28 +190,48 @@ function App() {
     if (searchCategory != null) setSearchCategory(searchCategory);
   }
 
+  const handleShowDetail = async (pokemonName: string) => {
+    const response = await fetch(`${fetchUrl}/${pokemonName.toLowerCase()}`);
+    if (response.status === 200) {
+      const data = await response.json();
+      console.log({data});
+      setDetail(data);
+    }
+  }
+
   return (
     <div className="App">
-      <div className="container-links">
-          <button disabled={isFirstPage()} onClick={(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => handleOffset(e)}>Previous</button>
-          <button disabled={isLastPage()} onClick={(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => handleOffset(e)}>Next</button>
-      </div>
-      <Navigation 
-        isFirstPage={isFirstPage()} 
-        isLastPage={isLastPage()} 
-        handleOffset={handleOffset} 
-        currentLimit={limit} 
-        handleLimit={(v: ILimit) => handleLimit(v)}
-        handleSortBy={(v: string) => setSortBy(v)}
-        handleSearch={(v: Record<string, string>) => handleSearhValues(v)}
-        />
-      <div className="container-cards">
-        {pokeData.length > 0 
-        ? pokeData.map((pokemon, i) => 
-          <Card key={`${pokemon.name}-${i}`} name={pokemon.name} weight={pokemon.weight} height={pokemon.height} abilities={pokemon.abilities} image={pokemon.image} />
-        )
-        : <p>Loading</p>}
-      </div>
+      {detail == null ? (
+        <>
+          <div className="container-links">
+              <button disabled={isFirstPage()} onClick={(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => handleOffset(e)}>Previous</button>
+              <button disabled={isLastPage()} onClick={(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => handleOffset(e)}>Next</button>
+          </div>
+          <Navigation 
+            isFirstPage={isFirstPage()} 
+            isLastPage={isLastPage()} 
+            handleOffset={handleOffset} 
+            currentLimit={limit} 
+            handleLimit={(v: ILimit) => handleLimit(v)}
+            handleSortBy={(v: string) => setSortBy(v)}
+            handleSearch={(v: Record<string, string>) => handleSearhValues(v)}
+            />
+          <div className="container-cards">
+            {pokeData.length > 0
+            ? pokeData.map((pokemon, i) => 
+              <Card 
+              key={`${pokemon.name}-${i}`} 
+              name={pokemon.name} 
+              weight={pokemon.weight} 
+              height={pokemon.height} 
+              abilities={pokemon.abilities} 
+              image={pokemon.image}
+              showDetail={() => handleShowDetail(pokemon.name)}
+              />
+              )
+              : <p>Loading</p>}
+          </div>
+
     
       <div className="container-links">
           <button disabled={isFirstPage()} onClick={(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => handleOffset(e)}>Previous</button>
@@ -228,6 +239,13 @@ function App() {
       </div>
 
     {limit > 10 && (<button onClick={() => window.scrollTo(0, 0)} className="button-scrollup">↑</button>)}
+      </>
+      ) : (
+                <>
+                <button onClick={() => setDetail(null)} className="button-back">Go back</button>
+                <Detail {...detail} />
+                </>
+             )}
     </div>
   );
 }

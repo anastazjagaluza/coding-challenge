@@ -33,3 +33,7 @@
   font-size: 230%;
   transition: .2s;
 }
+
+.button-back {
+  margin-bottom: 1rem;
+}

@@ -1,0 +1,10 @@
+.card-container-detail {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-items: center;
+}
+
+.image-official {
+    width: 20vh;
+}

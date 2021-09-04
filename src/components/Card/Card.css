@@ -5,9 +5,8 @@
     flex-direction: column;
 }
 
-.card-container:hover {
+.card-container.shadow:hover {
     box-shadow: 3px 2px 6px gray;
-
 }
 
 img {
