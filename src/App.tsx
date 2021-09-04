@@ -1,24 +1,28 @@
-import React from 'react';
-import logo from './logo.svg';
+import { useEffect, useState } from 'react';
 import './App.css';
 
+type ILimit = 10 | 20 | 50; 
+
 function App() {
+  const [limit, setLimit] = useState<ILimit>(10);
+  
+  useEffect(() => {
+    init();
+  }, [])
+
+  const init = async () => {
+    const response = await fetch(`https://pokeapi.co/api/v2/pokemon?limit=${limit}&offset=0`);
+    if (response.status == 200) {
+      const data = await response.json();
+      console.log({data});
+    }
+  }
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <div className="container">
+
+      </div>
     </div>
   );
 }
