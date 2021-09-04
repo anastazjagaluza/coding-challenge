@@ -82,7 +82,6 @@ function App() {
                 setTimeout(() => {
                   setPokeData([...newPokeData]);
                 }, 1000);
-                console.log("setting in the search")
               } else {
                 toast.error("Sorry, we couldn't find what you were looking for.");
                 setSearchValue(undefined);
@@ -152,7 +151,6 @@ function App() {
       }
       if (newPokeData != null) {
         setPokeData(newPokeData);
-        console.log("in the init")
       }
       setMaxLimit(data.count);
     } else {
@@ -210,7 +208,6 @@ function App() {
     const response = await fetch(`${fetchUrl}/${pokemonName.toLowerCase()}`);
     if (response.status === 200) {
       const data = await response.json();
-      console.log({data});
       setDetail(data);
     } else {
       toast.error("Something went wrong, please try again later");
