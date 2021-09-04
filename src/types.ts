@@ -11,5 +11,4 @@ export interface ICard {
     url: string;
 }
 
-
 export type ILimit = 10 | 20 | 50; 
