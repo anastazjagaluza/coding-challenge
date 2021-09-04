@@ -1,0 +1,9 @@
+.card-container {
+    cursor: pointer;
+    box-shadow: 3px 2px 6px lightgray;
+}
+
+img {
+    width: 10rem;
+    height: 10rem;
+}
