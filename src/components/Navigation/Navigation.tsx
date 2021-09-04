@@ -42,6 +42,9 @@ function Navigation({isFirstPage, isLastPage, handleOffset, handleLimit, current
       handleSearch({searchValue, searchCategory});
       window.history.pushState({}, "", `/?search=${searchValue}&category=${searchCategory}`);
       window.history.go(1);
+    } else {
+      e.preventDefault();
+      return;
     }
   }
 
