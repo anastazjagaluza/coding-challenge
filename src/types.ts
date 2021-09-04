@@ -7,6 +7,11 @@ export interface IPokeData {
 }
 
 export interface ICard {
+    url: string;
+    dispatchDetails: Function;
+}
+
+export interface IPokemon {
     name: string;
     url: string;
 }
@@ -17,6 +22,7 @@ export interface INavigation {
     handleOffset: Function; 
     handleLimit: Function; 
     currentLimit?: ILimit;
+    handleSortBy?: Function;
 }
 
 export type ILimit = 10 | 20 | 50; 
