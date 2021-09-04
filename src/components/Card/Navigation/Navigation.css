@@ -1,28 +1,35 @@
 
-.container-links {
+.container-navigation {
     width: 100%;
     display: flex;
-    justify-content: center;
-  }
-  
-  .container-links > button:first-of-type {
-    margin-right: 1rem;
-  }
-  
-  .container-links > button:last-of-type {
-    margin-left: 1rem;
-  }
+    justify-content: space-between;
+}
 
-  button {
-    background-color: white;
-    border: 1px solid gray;
-    padding: .2rem .3rem;
-    width: 6rem;
+button {
+  background-color: white;
+  border: 1px solid gray;
+  padding: .2rem .3rem;
+  width: 6rem;
+}
 
-  }
+.container-navigation > div {
+  width: 33vw;
+  display: flex;
+}
 
-  select {
-    border: none;
-    border-bottom: 1px solid gray;
-    margin: 0 .5rem 0 .5rem;
-  }
+.container-links {
+  justify-content: center;
+}
+
+.container-search {
+  justify-content: flex-end;
+}
+
+select {
+  border: none;
+  border-bottom: 1px solid gray;
+}
+
+select, input[type=text] {
+  margin: 0 .5rem 0 .5rem;
+}

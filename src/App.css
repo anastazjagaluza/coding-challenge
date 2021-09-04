@@ -13,6 +13,12 @@
   margin: .5rem 0 0.5rem 0;
 }
 
+.container-links-bottom {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
 .button-scrollup {
   position: fixed;
   font-size: 180%;

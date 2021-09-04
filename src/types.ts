@@ -21,8 +21,9 @@ export interface INavigation {
     isLastPage: boolean;
     handleOffset: Function; 
     handleLimit: Function; 
-    currentLimit?: ILimit;
-    handleSortBy?: Function;
+    currentLimit: ILimit;
+    handleSortBy: Function;
+    handleSearch: Function;
 }
 
 export type ILimit = 10 | 20 | 50; 
