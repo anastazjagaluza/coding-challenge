@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ICard, IPokeData } from "../types";
+import { ICard, IPokeData } from "../../types";
 import './Card.css';
 
 function Card({name, url}: ICard) {

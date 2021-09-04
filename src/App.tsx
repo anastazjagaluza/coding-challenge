@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './App.css';
-import Card from "./components/Card";
+import Card from "./components/Card/Card";
+import NavigationLinks from './components/Card/NavigationLinks/NavigationLinks';
 import { ILimit, ICard } from "./types";
 
 function App() {
@@ -46,10 +47,7 @@ function App() {
 
   return (
     <div className="App">
-      <div className="container-links">
-        <button disabled={isFirstPage()} onClick={(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => handleOffset(e)}>Previous</button>
-        <button disabled={isLastPage()} onClick={(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => handleOffset(e)}>Next</button>
-      </div>
+      <NavigationLinks isFirstPage={isFirstPage()} isLastPage={isLastPage()} handleOffset={handleOffset} />
       <div className="container-cards">
         {pokemons.length > 0 
         ? pokemons.map((pokemon) => 
@@ -57,6 +55,7 @@ function App() {
         )
         : <p>Loading</p>}
       </div>
+      <NavigationLinks isFirstPage={isFirstPage()} isLastPage={isLastPage()} handleOffset={handleOffset} />
     </div>
   );
 }

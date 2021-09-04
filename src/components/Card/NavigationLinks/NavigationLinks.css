@@ -1,0 +1,14 @@
+
+.container-links {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+  
+  .container-links > button:first-of-type {
+    margin-right: 1rem;
+  }
+  
+  .container-links > button:last-of-type {
+    margin-left: 1rem;
+  }
