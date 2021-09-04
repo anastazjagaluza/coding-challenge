@@ -5,6 +5,8 @@ import Detail from './components/Detail/Detail';
 import Navigation from './components/Navigation/Navigation';
 import { sortables } from './util/constants';
 import { ILimit, IPokeData } from "./util/types";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   const [limit, setLimit] = useState<ILimit>(10);
@@ -16,14 +18,14 @@ function App() {
   const [pokeData, setPokeData] = useState<IPokeData[]>([]);
   const [detail, setDetail] = useState<[] | null>(null);
   const fetchUrl = "https://pokeapi.co/api/v2/pokemon";
-
+  
   /**
    * Initially we need to apply any potential changes to the fetch from url
    */
   useEffect(() => {
     applyValuesFromUrlParams();
   }, [])
-
+  
   /**
    * On every upade of the values that can affect the data, we need to fetch all over again. In order to avoid data duplication
    * the array pokeData needs to be initially cleared.
@@ -31,57 +33,57 @@ function App() {
   useEffect(() => {
     init();
   }, [offset, limit, fetchUrl]);
-
+  
   /**
    * If the sortby is updated, we need to sort data appropriately.
    */
-
+  
   useEffect(() => {
     const handleSortBy = () => {
       switch(sortBy) {
         case "Name":
           setPokeData([...pokeData.sort((a: IPokeData, b: IPokeData) => (a.name > b.name) ? 1 : -1)]);
           break;
-        case "Height":
-          setPokeData([...pokeData.sort((a: IPokeData, b: IPokeData) => (a.height > b.height) ? 1 : -1)]);
-          break;
-        case "Weight":
-          setPokeData([...pokeData.sort((a: IPokeData, b: IPokeData) => (a.weight > b.weight) ? 1 : -1)]);
-          break;
-      }
-    }
-
-    handleSortBy();
-  }, [sortBy]);
-
-  /**
-   * When the search-related data is updated, we also update the search
-   */
-  useEffect(() => {
-    if (searchCategory != null && searchValue != null) {
-      const handleSearch = () => {
+          case "Height":
+            setPokeData([...pokeData.sort((a: IPokeData, b: IPokeData) => (a.height > b.height) ? 1 : -1)]);
+            break;
+            case "Weight":
+              setPokeData([...pokeData.sort((a: IPokeData, b: IPokeData) => (a.weight > b.weight) ? 1 : -1)]);
+              break;
+            }
+          }
+          
+          handleSortBy();
+        }, [sortBy]);
+        
+        /**
+         * When the search-related data is updated, we also update the search
+         */
+        useEffect(() => {
+          if (searchCategory != null && searchValue != null) {
+            const handleSearch = () => {
         if (searchValue != null && searchCategory != null) {
           const newPokeData: IPokeData[] = [];
           if (searchCategory === "name") {
-          for (const pokemon of pokeData) {
-            if (pokemon.name.toLowerCase() === searchValue.toLowerCase()) {
-              newPokeData.push(pokemon);
+            for (const pokemon of pokeData) {
+              if (pokemon.name.toLowerCase() === searchValue.toLowerCase()) {
+                newPokeData.push(pokemon);
+              }
+            }
+          } else if (searchCategory === "abilities") {
+            for (const pokemon of pokeData) {
+              if (pokemon.abilities.includes(searchValue.toLowerCase())) {
+                newPokeData.push(pokemon);
+              }
             }
           }
-        } else if (searchCategory === "abilities") {
-          for (const pokemon of pokeData) {
-            if (pokemon.abilities.includes(searchValue.toLowerCase())) {
-              newPokeData.push(pokemon);
-            }
-          }
-        }
           if (newPokeData.length > 0) {
             setPokeData([...newPokeData]);
           } else {
-            console.log("show error");
+            toast.error("Something went wrong, please try again later");
           }
         }
-    
+        
       }
       handleSearch();
     } else {
@@ -89,7 +91,7 @@ function App() {
     }
   }, [searchValue, searchCategory])
   
-
+  
   /**
    * In order to preserve the user passed values for limit, offset or search, the need to be picked up from the params.
    */
@@ -127,7 +129,7 @@ function App() {
       
     }
   }
-
+  
   const init = async () => {
     setPokeData([]);
     const response = await fetch(`${fetchUrl}?limit=${limit}&offset=${offset}`);
@@ -144,6 +146,8 @@ function App() {
         setPokeData(newPokeData);
       }
       setMaxLimit(data.count);
+    } else {
+      toast.error("Something went wrong, please try again later");
     }
   }
 
@@ -181,6 +185,8 @@ function App() {
       const name = data.name[0].toUpperCase() + data.name.slice(1);
       const newPokeData = { name, height, weight, abilities: abilities.toString().replace(",", ", "), image};
       return newPokeData;
+    } else {
+      toast.error("Something went wrong, please try again later");
     }
   }
 
@@ -196,11 +202,14 @@ function App() {
       const data = await response.json();
       console.log({data});
       setDetail(data);
+    } else {
+      toast.error("Something went wrong, please try again later");
     }
   }
 
   return (
     <div className="App">
+      <ToastContainer />
       {detail == null ? (
         <>
           <div className="container-links">
