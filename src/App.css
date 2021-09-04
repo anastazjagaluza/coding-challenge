@@ -13,6 +13,21 @@
   margin: .5rem 0 0.5rem 0;
 }
 
+.button-scrollup {
+  position: fixed;
+  font-size: 180%;
+  right: 2rem;
+  bottom: 3rem;
+  background: white;
+  border: none;
+  cursor: pointer;
+}
+
+.button-scrollup:hover {
+  font-size: 230%;
+  transition: .2s;
+}
+
 @media (prefers-reduced-motion: no-preference) {
   
 }

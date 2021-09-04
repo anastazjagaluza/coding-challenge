@@ -12,3 +12,17 @@
   .container-links > button:last-of-type {
     margin-left: 1rem;
   }
+
+  button {
+    background-color: white;
+    border: 1px solid gray;
+    padding: .2rem .3rem;
+    width: 6rem;
+
+  }
+
+  select {
+    border: none;
+    border-bottom: 1px solid gray;
+    margin: 0 .5rem 0 .5rem;
+  }

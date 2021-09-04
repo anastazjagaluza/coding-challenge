@@ -15,8 +15,8 @@ export interface INavigation {
     isFirstPage: boolean; 
     isLastPage: boolean;
     handleOffset: Function; 
-    currentLimit: ILimit;
     handleLimit: Function; 
+    currentLimit?: ILimit;
 }
 
 export type ILimit = 10 | 20 | 50; 

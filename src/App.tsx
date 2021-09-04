@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import './App.css';
 import Card from "./components/Card/Card";
 import Navigation from './components/Card/Navigation/Navigation';
@@ -10,6 +10,7 @@ function App() {
   const [maxLimit, setMaxLimit] = useState<number>(0);
   const [pokemons, setPokemons] = useState<Array<ICard>>([]);
   const [fetchUrl, setFetchUrl] = useState<string>("https://pokeapi.co/api/v2/pokemon");
+  const cards = useRef(null);
 
   const isLastPage = () => {
     return offset * limit === maxLimit - limit;
@@ -20,7 +21,6 @@ function App() {
 
   useEffect(() => {
     init();
-    console.log({offset});
   }, [offset, limit]);
 
 
@@ -43,21 +43,21 @@ function App() {
       const data = await response.json();
       setPokemons(data.results);
       setMaxLimit(data.count);
-      console.log({data});
     }
   }
 
   return (
     <div className="App">
       <Navigation isFirstPage={isFirstPage()} isLastPage={isLastPage()} handleOffset={handleOffset} currentLimit={limit} handleLimit={(v: ILimit) => handleLimit(v)} />
-      <div className="container-cards">
+      <div ref={cards} className="container-cards">
         {pokemons.length > 0 
         ? pokemons.map((pokemon) => 
           <Card name={pokemon.name} url={pokemon.url} />
         )
         : <p>Loading</p>}
       </div>
-      <Navigation isFirstPage={isFirstPage()} isLastPage={isLastPage()} handleOffset={handleOffset} currentLimit={limit} handleLimit={(v: ILimit) => handleLimit(v)} />
+      <Navigation isFirstPage={isFirstPage()} isLastPage={isLastPage()} handleOffset={handleOffset} handleLimit={(v: ILimit) => handleLimit(v)} />
+    {limit > 10 && (<button onClick={() => window.scrollTo(0, 0)} className="button-scrollup">↑</button>)}
     </div>
   );
 }
