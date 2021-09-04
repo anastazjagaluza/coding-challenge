@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './App.css';
 import Card from "./components/Card/Card";
-import NavigationLinks from './components/Card/NavigationLinks/NavigationLinks';
+import Navigation from './components/Card/Navigation/Navigation';
 import { ILimit, ICard } from "./types";
 
 function App() {
@@ -20,20 +20,21 @@ function App() {
 
   useEffect(() => {
     init();
+    console.log({offset});
   }, [offset, limit]);
 
 
   const handleOffset = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     const target = e.target as HTMLButtonElement;
     if (target.textContent === "Previous") {
-      if (offset > 0) {
-        setOffset(offset - limit);
-      }
+        setOffset(offset - Number(limit));
       } else if (target.textContent === "Next") {
-        if (offset * limit < maxLimit) {
-          setOffset(offset + limit);
-        }
+          setOffset(offset + Number(limit));
     }
+  }
+
+  const handleLimit = (v: ILimit) => {
+    setLimit(v);
   }
 
   const init = async () => {
@@ -42,12 +43,13 @@ function App() {
       const data = await response.json();
       setPokemons(data.results);
       setMaxLimit(data.count);
+      console.log({data});
     }
   }
 
   return (
     <div className="App">
-      <NavigationLinks isFirstPage={isFirstPage()} isLastPage={isLastPage()} handleOffset={handleOffset} />
+      <Navigation isFirstPage={isFirstPage()} isLastPage={isLastPage()} handleOffset={handleOffset} currentLimit={limit} handleLimit={(v: ILimit) => handleLimit(v)} />
       <div className="container-cards">
         {pokemons.length > 0 
         ? pokemons.map((pokemon) => 
@@ -55,7 +57,7 @@ function App() {
         )
         : <p>Loading</p>}
       </div>
-      <NavigationLinks isFirstPage={isFirstPage()} isLastPage={isLastPage()} handleOffset={handleOffset} />
+      <Navigation isFirstPage={isFirstPage()} isLastPage={isLastPage()} handleOffset={handleOffset} currentLimit={limit} handleLimit={(v: ILimit) => handleLimit(v)} />
     </div>
   );
 }

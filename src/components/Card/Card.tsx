@@ -29,7 +29,7 @@ function Card({name, url}: ICard) {
   return (
     <div className="card-container">
      <img src={image}/>
-     <h1>{name}</h1>
+     <h3>{name}</h3>
      <p>Height: {height}, Weight: {weight}</p>
      <p>Abilities: {abilities}</p>
     </div>

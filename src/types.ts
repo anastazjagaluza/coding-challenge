@@ -11,4 +11,12 @@ export interface ICard {
     url: string;
 }
 
+export interface INavigation {
+    isFirstPage: boolean; 
+    isLastPage: boolean;
+    handleOffset: Function; 
+    currentLimit: ILimit;
+    handleLimit: Function; 
+}
+
 export type ILimit = 10 | 20 | 50; 
