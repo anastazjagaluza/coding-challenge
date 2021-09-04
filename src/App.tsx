@@ -7,6 +7,7 @@ import { sortables } from './util/constants';
 import { ILimit, IPokeData } from "./util/types";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Loader from "react-loader-spinner";
 
 function App() {
   const [limit, setLimit] = useState<ILimit>(10);
@@ -17,15 +18,14 @@ function App() {
   const [searchCategory, setSearchCategory] = useState<string>();
   const [pokeData, setPokeData] = useState<IPokeData[]>([]);
   const [detail, setDetail] = useState<[] | null>(null);
-  const fetchUrl = "https://pokeapi.co/api/v2/pokemon";
-  
-  /**
-   * Initially we need to apply any potential changes to the fetch from url
-   */
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const fetchUrl = "https://pokeapi.co/api/v2/pokemon";  
+
   useEffect(() => {
-    applyValuesFromUrlParams();
-  }, [])
-  
+    if (pokeData.length === limit) {
+      applyValuesFromUrlParams();
+    }
+  }, [pokeData])
   /**
    * On every upade of the values that can affect the data, we need to fetch all over again. In order to avoid data duplication
    * the array pokeData needs to be initially cleared.
@@ -60,32 +60,41 @@ function App() {
          * When the search-related data is updated, we also update the search
          */
         useEffect(() => {
-          if (searchCategory != null && searchValue != null) {
-            const handleSearch = () => {
-        if (searchValue != null && searchCategory != null) {
-          const newPokeData: IPokeData[] = [];
-          if (searchCategory === "name") {
-            for (const pokemon of pokeData) {
-              if (pokemon.name.toLowerCase() === searchValue.toLowerCase()) {
-                newPokeData.push(pokemon);
+          const handleSearch = () => {
+            if (searchValue != null && searchCategory != null) {
+              const newPokeData: IPokeData[] = [];
+              if (searchCategory === "name") {
+                for (const pokemon of pokeData) {
+                  if (pokemon.name.toLowerCase() === searchValue.toLowerCase()) {
+                    newPokeData.push(pokemon);
+                  }
+                }
               }
-            }
-          } else if (searchCategory === "abilities") {
-            for (const pokemon of pokeData) {
-              if (pokemon.abilities.includes(searchValue.toLowerCase())) {
-                newPokeData.push(pokemon);
+              else if (searchCategory === "abilities") {
+                for (const pokemon of pokeData) {
+                  if (pokemon.abilities.includes(searchValue.toLowerCase())) {
+                    newPokeData.push(pokemon);
+                  }
+                }
               }
-            }
+              if (newPokeData.length > 0) {
+                // this timeout is in order to avoid the race condition since state is asynchronous in react
+                setTimeout(() => {
+                  setPokeData([...newPokeData]);
+                }, 1000);
+                console.log("setting in the search")
+              } else {
+                toast.error("Sorry, we couldn't find what you were looking for.");
+                setSearchValue(undefined);
+                setSearchCategory(undefined);
+                window.history.pushState({}, "", "/");
+              }
+                setIsLoading(false);   
+              } 
           }
-          if (newPokeData.length > 0) {
-            setPokeData([...newPokeData]);
-          } else {
-            toast.error("Something went wrong, please try again later");
-          }
-        }
-        
-      }
-      handleSearch();
+
+    if (searchCategory != null && searchValue != null) {
+        handleSearch();
     } else {
       init();
     }
@@ -107,19 +116,9 @@ function App() {
       }
       
       // apply offset from params
-      const offset = Number(params.get("offset"));
+      const offset = params.get("offset");
       if (offset != null) {
-        setOffset(offset);
-      }
-      
-      // apply search from params, both have to be present to work
-      const searchValue = params.get("search");
-      const searchCategory = params.get("category");
-      
-      // limit and offset are not a thing for searching
-      if (searchValue != null && searchCategory != null && limit === null && offset === null) {
-        setSearchCategory(searchCategory);
-        setSearchValue(searchValue);
+        setOffset(Number(offset));
       }
       
       const sortBy = params.get("sortBy");
@@ -127,11 +126,20 @@ function App() {
         setSortBy(sortBy);
       }
       
+      // apply search from params, both have to be present to work
+      const searchValue = params.get("search");
+      const searchCategory = params.get("category");
+      
+      if (searchValue != null && searchCategory != null) {
+        handleSearhValues({searchValue, searchCategory});
+      }
+
     }
   }
   
   const init = async () => {
     setPokeData([]);
+    setIsLoading(true);
     const response = await fetch(`${fetchUrl}?limit=${limit}&offset=${offset}`);
     if (response.status === 200) {
       const data = await response.json();
@@ -144,11 +152,13 @@ function App() {
       }
       if (newPokeData != null) {
         setPokeData(newPokeData);
+        console.log("in the init")
       }
       setMaxLimit(data.count);
     } else {
       toast.error("Something went wrong, please try again later");
     }
+    setIsLoading(false);
   }
 
   const isLastPage = () => {
@@ -207,6 +217,12 @@ function App() {
     }
   }
 
+  const clearSearch = () => {
+    setSearchValue(undefined);
+    setSearchCategory(undefined);
+    window.history.pushState({}, "", "/")
+  }
+
   return (
     <div className="App">
       <ToastContainer />
@@ -226,21 +242,29 @@ function App() {
             handleSearch={(v: Record<string, string>) => handleSearhValues(v)}
             />
           <div className="container-cards">
-            {pokeData.length > 0
-            ? pokeData.map((pokemon, i) => 
-              <Card 
-              key={`${pokemon.name}-${i}`} 
-              name={pokemon.name} 
-              weight={pokemon.weight} 
-              height={pokemon.height} 
-              abilities={pokemon.abilities} 
-              image={pokemon.image}
-              showDetail={() => handleShowDetail(pokemon.name)}
-              />
-              )
-              : <p>Loading</p>}
+            {pokeData.length > 0 && pokeData.map((pokemon, i) => 
+            <Card 
+            key={`${pokemon.name}-${i}`} 
+            name={pokemon.name} 
+            weight={pokemon.weight} 
+            height={pokemon.height} 
+            abilities={pokemon.abilities} 
+            image={pokemon.image}
+            showDetail={() => handleShowDetail(pokemon.name)}
+            />)}
           </div>
+          {searchCategory != null && searchValue != null && (
+            <div className="container-button-clear">
+              <button onClick={clearSearch} className="button-back">Clear search</button>
+            </div>
+          )}
 
+        {isLoading && 
+            (
+            <div className="container-loader">
+                <Loader type="Puff" />
+              </div> 
+            )}
     
       <div className="container-links">
           <button disabled={isFirstPage()} onClick={(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => handleOffset(e)}>Previous</button>

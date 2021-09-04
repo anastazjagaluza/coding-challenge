@@ -37,3 +37,21 @@
 .button-back {
   margin-bottom: 1rem;
 }
+
+.container-loader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  place-content: center;
+  place-items: center;
+  background: white;
+}
+
+.container-button-clear {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
