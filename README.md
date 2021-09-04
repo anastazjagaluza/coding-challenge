@@ -1,38 +1,34 @@
-### `npm start`
+<h1 align="center">Pokemon Coding Challenge</h1>
+<br/>
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+* A simple React app fetching and dipslaying data about different pokemon
+* User can search for pokemon by name or ability
+* User can choose how many pokemon should be displayed (whether it's 10, 20 or 50)
+* User can sort displayed pokemon by name, height and weight
+* Provided with basic integration tests written in cypress
+* App is coded in TypeScript
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+<img width="10%" height="10%" align="center" src="https://www.kindpng.com/picc/m/0-9439_charmander-github-vicky002charmander-a-bot-for-slack-pokemon.png">
 
-### `npm test`
+## ➤ Table of Contents
+* [➤ 0. Installation](#-0-installation)
+* [➤ 1. Get it running](#-1-get-it-running)
+* [➤ 2. Running the tests](#-2-running-the-tests)
+* [➤ License](#-license)
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## ➤ 0. Installation
+Clone the repository and run ```npm install``` from the root folder.
 
-### `npm run build`
+## ➤ 1. Get it running
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+After you have installed everything, run ```npm start``` command in the terminal and wait for a few seconds. If the page doesn't open automatically, try going to <a href="http://localhost:3000" target="_blank" >http://localhost:3000</a> to open the page.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## ➤ 2. Running the tests
+The test are in the /cypress folder in the root of the project. You can run them in two ways - either headlessly, in the CLI or in a cypress UI. In both cases, you first need to run the application in a separate CLI.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+For the headless testing, write ```npm test``` in a separate terminal after you have run the development mode. 
+For the testing UI, write ```npm run cypress:open``` in a separate terminal after you run the development mode, and wait for a few seconds for the UI to open. After that you can click the only available test on the list.
 
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+## ➤ License
+	
+Licensed under [MIT](https://opensource.org/licenses/MIT).
