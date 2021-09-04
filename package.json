@@ -21,7 +21,15 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "lint": "eslint src/**/*.tsx",
+    "lint:fix": "eslint --fix src/**/*.tsx"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run lint:fix",
+      "pre-push": "npm run lint"
+    }
   },
   "eslintConfig": {
     "extends": [
@@ -40,5 +48,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "husky": "^7.0.2"
   }
 }

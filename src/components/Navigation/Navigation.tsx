@@ -83,7 +83,6 @@ function Navigation({isFirstPage, isLastPage, handleOffset, handleLimit, current
             <button type="submit">Search</button>
           </form>
         </div>
-
       </div>
     )
 }
