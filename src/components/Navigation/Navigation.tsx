@@ -3,7 +3,7 @@ import { sortables } from "../../util/constants";
 import { ILimit, INavigation } from "../../util/types";
 import "./Navigation.css";
 
-function Navigation({isFirstPage, isLastPage, handleOffset, handleLimit, currentLimit, handleSortBy, handleSearch }: INavigation) {
+function Navigation({ handleLimit, currentLimit, handleSortBy, handleSearch }: INavigation) {
   const [searchValue, setSearchValue] = useState<string>();
   const [searchCategory, setSearchCategory] = useState<"name" | "abilities">();
 
@@ -54,7 +54,7 @@ function Navigation({isFirstPage, isLastPage, handleOffset, handleLimit, current
             {currentLimit != null && (
               <>
             <span>Show </span>
-            <select defaultValue="default" onChange={(e) => dispatchNewLimit(e)}>
+            <select id="select-limits" defaultValue="default" onChange={(e) => dispatchNewLimit(e)}>
               <option value="default" disabled>Choose a limit</option>
               {limits.map(limit => <option key={limit} value={limit}>{limit}</option>)}
             </select>
@@ -66,7 +66,7 @@ function Navigation({isFirstPage, isLastPage, handleOffset, handleLimit, current
             {handleSortBy != null && (
               <>
             <span>Sort by</span>
-            <select defaultValue="default" onChange={(e) => dispatchNewSortable(e)}>
+            <select id="select-sortby" defaultValue="default" onChange={(e) => dispatchNewSortable(e)}>
               <option value="default">Choose a category</option>
               {sortables.map(sortable => <option key={sortable} value={sortable}>{sortable.replace("-", " ")}</option>)}
             </select>
@@ -78,7 +78,7 @@ function Navigation({isFirstPage, isLastPage, handleOffset, handleLimit, current
             <span>Search </span>
             <input onChange={(e) => dispatchSearchValue(e)} required type="text"></input>
             <span>in</span>
-            <select defaultValue="default" onChange={(e) => dispatchSearchCategory(e)} required>
+            <select id="select-category" defaultValue="default" onChange={(e) => dispatchSearchCategory(e)} required>
               <option value="default" disabled>Choose a category</option>
               <option value="name">Name</option>
               <option value="abilities">Abilities</option>

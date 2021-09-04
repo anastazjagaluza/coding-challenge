@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@cypress/react": "^5.9.4",
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^11.2.7",
     "@testing-library/user-event": "^12.8.3",
@@ -10,6 +11,7 @@
     "@types/node": "^12.20.23",
     "@types/react": "^17.0.19",
     "@types/react-dom": "^17.0.9",
+    "cypress-react-selector": "^1.0.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-json-to-table": "^0.1.7",
@@ -22,7 +24,8 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test": "./node_modules/.bin/cypress open",
+    "cypress:open": "./node_modules/.bin/cypress open",
     "eject": "react-scripts eject",
     "lint": "eslint src/**/*.tsx",
     "lint:fix": "eslint --fix src/**/*.tsx"
@@ -52,6 +55,7 @@
     ]
   },
   "devDependencies": {
+    "cypress": "^8.3.1",
     "husky": "^7.0.2"
   }
 }

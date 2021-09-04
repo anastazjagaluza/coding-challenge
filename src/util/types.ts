@@ -18,9 +18,6 @@ export interface IPokemon {
 }
 
 export interface INavigation {
-    isFirstPage: boolean; 
-    isLastPage: boolean;
-    handleOffset: Function; 
     handleLimit: Function; 
     currentLimit: ILimit;
     handleSortBy: Function;

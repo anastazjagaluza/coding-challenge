@@ -169,10 +169,19 @@ function App() {
 
   const handleOffset = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     const target = e.target as HTMLButtonElement;
+    let newOffset;
     if (target.textContent === "Previous") {
-        setOffset(offset - Number(limit));
+        newOffset = offset - Number(limit);
       } else if (target.textContent === "Next") {
-          setOffset(offset + Number(limit));
+        newOffset = offset + Number(limit);
+    }
+    if (newOffset != null) {
+      setOffset(newOffset);
+      if (limit === 10) {
+        window.history.pushState({}, "", `/?offset=${newOffset}`)
+      } else {
+        window.history.pushState({}, "", `/?limit=${limit}&offset=${newOffset}`)
+      }
     }
   }
 
@@ -230,9 +239,6 @@ function App() {
               <button disabled={isLastPage()} onClick={(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => handleOffset(e)}>Next</button>
           </div>
           <Navigation 
-            isFirstPage={isFirstPage()} 
-            isLastPage={isLastPage()} 
-            handleOffset={handleOffset} 
             currentLimit={limit} 
             handleLimit={(v: ILimit) => handleLimit(v)}
             handleSortBy={(v: string) => setSortBy(v)}

@@ -3,6 +3,7 @@
     box-shadow: 3px 2px 6px lightgray;
     display: flex;
     flex-direction: column;
+    align-items: center;
 }
 
 .card-container.shadow:hover {
