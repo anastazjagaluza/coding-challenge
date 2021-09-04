@@ -12,6 +12,7 @@ function Navigation({isFirstPage, isLastPage, handleOffset, handleLimit, current
   const dispatchNewLimit = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const target = e.target;
     handleLimit(target.value);
+    window.history.pushState({}, "", `/?limit=${target.value}`)
   }
 
   const dispatchNewSortable = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -47,8 +48,8 @@ function Navigation({isFirstPage, isLastPage, handleOffset, handleLimit, current
         {currentLimit != null && (
           <>
         <span>Show </span>
-        <select onChange={(e) => dispatchNewLimit(e)}>
-          {limits.map(limit => <option key={limit} defaultValue={currentLimit} value={limit}>{limit}</option>)}
+        <select defaultValue={currentLimit} onChange={(e) => dispatchNewLimit(e)}>
+          {limits.map(limit => <option key={limit} value={limit}>{limit}</option>)}
         </select>
         <span> on each page</span>
         </>

@@ -2,13 +2,15 @@ import React, { useEffect, useRef, useState } from 'react';
 import './App.css';
 import Card from "./components/Card/Card";
 import Navigation from './components/Card/Navigation/Navigation';
-import { ILimit, ICard, IPokemon, IPokeData } from "./types";
+import { ILimit, IPokeData } from "./types";
 
 function App() {
   const [limit, setLimit] = useState<ILimit>(10);
   const [offset, setOffset] = useState<number>(0);
   const [maxLimit, setMaxLimit] = useState<number>(0);
-  const [sortBy, setSortBy] = useState<string>("Name");
+  const [sortBy, setSortBy] = useState<string>();
+  const [searchValue, setSearchValue] = useState<string>();
+  const [searchCategory, setSearchCategory] = useState<string>();
   const [pokeData, setPokeData] = useState<IPokeData[]>([]);
   const [fetchUrl, setFetchUrl] = useState<string>("https://pokeapi.co/api/v2/pokemon");
   const cards = useRef(null);
@@ -21,12 +23,30 @@ function App() {
   }
 
   useEffect(() => {
+    if (document.location != null) {
+      const location = document.location as unknown as string;
+      let params = (new URL(location)).searchParams;
+      const limit = Number(params.get("limit"));
+      if (limit === 10 || limit === 20 || limit === 50) {
+        setLimit(limit);
+      }
+    }
+  }, [])
+
+  useEffect(() => {
+    setPokeData([]);
     init();
   }, [offset, limit, fetchUrl]);
 
   useEffect(() => {
     handleSortBy();
   }, [sortBy]);
+
+  useEffect(() => {
+    if (searchCategory != null && searchValue != null) {
+      handleSearch();
+    }
+  }, [searchValue, searchCategory])
   
 
   const handleOffset = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -41,6 +61,10 @@ function App() {
   const handleLimit = (v: ILimit) => {
     setLimit(v);
   }
+
+  useEffect(() => {
+    console.log({pokeData});
+  }, [pokeData])
   
   const handleSortBy = () => {
     switch(sortBy) {
@@ -60,8 +84,15 @@ function App() {
     const response = await fetch(`${fetchUrl}?limit=${limit}&offset=${offset}`);
     if (response.status === 200) {
       const data = await response.json();
+      const newPokeData: IPokeData[] = [];
       for (const item of data.results) {
-        getAndSavePokeData(item.url);
+        const newItem = await getAndSavePokeData(item.url);
+        if (newItem != null) {
+          newPokeData.push(newItem);
+        }
+      }
+      if (newPokeData != null) {
+        setPokeData(newPokeData);
       }
       setMaxLimit(data.count);
     }
@@ -79,23 +110,22 @@ function App() {
       };
       const name = data.name[0].toUpperCase() + data.name.slice(1);
       const newPokeData = { name, height, weight, abilities: abilities.toString().replace(",", ", "), image};
-      const currentData = pokeData;
-      currentData.push(newPokeData);
-      setPokeData([...currentData]);
+      return newPokeData;
     }
   }
 
-  const handleSearch = async (v: Record<string, string>) => {
+  const handleSearch = () => {
+    if (searchValue != null && searchCategory != null) {
       const newPokeData: IPokeData[] = [];
-      if (v.searchCategory === "name") {
+      if (searchCategory === "name") {
       for (const pokemon of pokeData) {
-        if (pokemon.name.toLowerCase() === v.searchValue.toLowerCase()) {
+        if (pokemon.name.toLowerCase() === searchValue.toLowerCase()) {
           newPokeData.push(pokemon);
         }
       }
-    } else if (v.searchCategory === "abilities") {
+    } else if (searchCategory === "abilities") {
       for (const pokemon of pokeData) {
-        if (pokemon.abilities.includes(v.searchValue.toLowerCase())) {
+        if (pokemon.abilities.includes(searchValue.toLowerCase())) {
           console.log(pokemon.abilities);
           newPokeData.push(pokemon);
         }
@@ -106,8 +136,14 @@ function App() {
       } else {
         console.log("show error");
       }
-      // setPokeData([...pokeData.sort((a: IPokeData, b: IPokeData) => (a.name > b.name) ? 1 : -1)]);
+    }
 
+  }
+
+  const handleSearhValues = (v: Record<string, string>) => {
+    const { searchValue, searchCategory } = v;
+    if (searchValue != null) setSearchValue(searchValue);
+    if (searchCategory != null) setSearchCategory(searchCategory);
   }
 
   return (
@@ -119,7 +155,7 @@ function App() {
         currentLimit={limit} 
         handleLimit={(v: ILimit) => handleLimit(v)}
         handleSortBy={(v: string) => setSortBy(v)}
-        handleSearch={(v: Record<string, string>) => handleSearch(v)}
+        handleSearch={(v: Record<string, string>) => handleSearhValues(v)}
         />
       <div ref={cards} className="container-cards">
         {pokeData.length > 0 
