@@ -1,8 +1,9 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './App.css';
 import Card from "./components/Card/Card";
 import Navigation from './components/Card/Navigation/Navigation';
-import { ILimit, IPokeData } from "./types";
+import { sortables } from './util/constants';
+import { ILimit, IPokeData } from "./util/types";
 
 function App() {
   const [limit, setLimit] = useState<ILimit>(10);
@@ -12,75 +13,132 @@ function App() {
   const [searchValue, setSearchValue] = useState<string>();
   const [searchCategory, setSearchCategory] = useState<string>();
   const [pokeData, setPokeData] = useState<IPokeData[]>([]);
-  const [fetchUrl, setFetchUrl] = useState<string>("https://pokeapi.co/api/v2/pokemon");
-  const cards = useRef(null);
+  const fetchUrl = "https://pokeapi.co/api/v2/pokemon";
 
-  const isLastPage = () => {
-    return offset * limit === maxLimit - limit;
-  }
-  const isFirstPage = () => {
-    return offset < 1;
-  }
-
+  /**
+   * Initially we need to apply any potential changes to the fetch from url
+   */
   useEffect(() => {
-    if (document.location != null) {
-      const location = document.location as unknown as string;
-      let params = (new URL(location)).searchParams;
-      const limit = Number(params.get("limit"));
-      if (limit === 10 || limit === 20 || limit === 50) {
-        setLimit(limit);
-      }
-    }
+    applyValuesFromUrlParams();
   }, [])
 
+  /**
+   * On every upade of the values that can affect the data, we need to fetch all over again. In order to avoid data duplication
+   * the array pokeData needs to be initially cleared.
+   */
   useEffect(() => {
-    setPokeData([]);
     init();
   }, [offset, limit, fetchUrl]);
 
+  /**
+   * If the sortby is updated, we need to sort data appropriately.
+   */
+
   useEffect(() => {
+    const handleSortBy = () => {
+      switch(sortBy) {
+        case "Name":
+          setPokeData([...pokeData.sort((a: IPokeData, b: IPokeData) => (a.name > b.name) ? 1 : -1)]);
+          break;
+        case "Height":
+          setPokeData([...pokeData.sort((a: IPokeData, b: IPokeData) => (a.height > b.height) ? 1 : -1)]);
+          break;
+        case "Weight":
+          setPokeData([...pokeData.sort((a: IPokeData, b: IPokeData) => (a.weight > b.weight) ? 1 : -1)]);
+          break;
+      }
+    }
+
     handleSortBy();
   }, [sortBy]);
 
+  /**
+   * When the search-related data is updated, we also update the search
+   */
   useEffect(() => {
     if (searchCategory != null && searchValue != null) {
+      const handleSearch = () => {
+        if (searchValue != null && searchCategory != null) {
+          const newPokeData: IPokeData[] = [];
+          if (searchCategory === "name") {
+          for (const pokemon of pokeData) {
+            if (pokemon.name.toLowerCase() === searchValue.toLowerCase()) {
+              newPokeData.push(pokemon);
+            }
+          }
+        } else if (searchCategory === "abilities") {
+          for (const pokemon of pokeData) {
+            if (pokemon.abilities.includes(searchValue.toLowerCase())) {
+              newPokeData.push(pokemon);
+            }
+          }
+        }
+          if (newPokeData.length > 0) {
+            setPokeData([...newPokeData]);
+          } else {
+            console.log("show error");
+          }
+        }
+    
+      }
       handleSearch();
+    } else {
+      init();
     }
   }, [searchValue, searchCategory])
   
-
-  const handleOffset = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    const target = e.target as HTMLButtonElement;
-    if (target.textContent === "Previous") {
-        setOffset(offset - Number(limit));
-      } else if (target.textContent === "Next") {
-          setOffset(offset + Number(limit));
-    }
-  }
-
-  const handleLimit = (v: ILimit) => {
-    setLimit(v);
-  }
-
-  useEffect(() => {
-    console.log({pokeData});
-  }, [pokeData])
-  
-  const handleSortBy = () => {
-    switch(sortBy) {
-      case "Name":
-        setPokeData([...pokeData.sort((a: IPokeData, b: IPokeData) => (a.name > b.name) ? 1 : -1)]);
-        break;
-      case "Height":
-        setPokeData([...pokeData.sort((a: IPokeData, b: IPokeData) => (a.height > b.height) ? 1 : -1)]);
-        break;
-      case "Weight":
-        setPokeData([...pokeData.sort((a: IPokeData, b: IPokeData) => (a.weight > b.weight) ? 1 : -1)]);
-        break;
+  /**
+   * In order to preserve the user passed values for limit, offset or search, the need to be picked up from the params.
+   */
+  const applyValuesFromUrlParams = () => {
+    if (document.location != null) {
+      const location = document.location as unknown as string;
+      const params = (new URL(location)).searchParams;
+      
+      // apply limit from params
+      const limit = Number(params.get("limit"));
+      if (limit === 10 || limit === 20 || limit === 50) {
+        setLimit(limit);
+      } 
+      // else {
+      //   // clear
+      //   window.history.pushState({}, "", "/");
+      // }
+      
+      // apply offset from params
+      const offset = Number(params.get("offset"));
+      if (offset != null) {
+        setOffset(offset);
+      } 
+      // else {
+      //   // clear
+      //   window.history.pushState({}, "", "/");
+      // }
+      
+      // apply search from params, both have to be present to work
+      const searchValue = params.get("search");
+      const searchCategory = params.get("category");
+      
+      // limit and offset are not a thing for searching
+      if (searchValue != null && searchCategory != null && limit === null && offset === null) {
+        setSearchCategory(searchCategory);
+        setSearchValue(searchValue);
+      } 
+      // else {
+      //   // clear
+      //   window.history.pushState({}, "", "/");
+      // }
+      
+      const sortBy = params.get("sortBy");
+      if (sortBy != null && (sortables.includes(sortBy))) {
+        setSortBy(sortBy);
+      }
+      
     }
   }
 
   const init = async () => {
+    setPokeData([]);
     const response = await fetch(`${fetchUrl}?limit=${limit}&offset=${offset}`);
     if (response.status === 200) {
       const data = await response.json();
@@ -96,6 +154,27 @@ function App() {
       }
       setMaxLimit(data.count);
     }
+  }
+
+  const isLastPage = () => {
+    return offset * limit === maxLimit - limit;
+  }
+  const isFirstPage = () => {
+    return offset < 1;
+  }
+
+
+  const handleOffset = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    const target = e.target as HTMLButtonElement;
+    if (target.textContent === "Previous") {
+        setOffset(offset - Number(limit));
+      } else if (target.textContent === "Next") {
+          setOffset(offset + Number(limit));
+    }
+  }
+
+  const handleLimit = (v: ILimit) => {
+    setLimit(v);
   }
 
   const getAndSavePokeData = async (url: string) => {
@@ -114,32 +193,6 @@ function App() {
     }
   }
 
-  const handleSearch = () => {
-    if (searchValue != null && searchCategory != null) {
-      const newPokeData: IPokeData[] = [];
-      if (searchCategory === "name") {
-      for (const pokemon of pokeData) {
-        if (pokemon.name.toLowerCase() === searchValue.toLowerCase()) {
-          newPokeData.push(pokemon);
-        }
-      }
-    } else if (searchCategory === "abilities") {
-      for (const pokemon of pokeData) {
-        if (pokemon.abilities.includes(searchValue.toLowerCase())) {
-          console.log(pokemon.abilities);
-          newPokeData.push(pokemon);
-        }
-      }
-    }
-      if (newPokeData.length > 0) {
-        setPokeData([...newPokeData]);
-      } else {
-        console.log("show error");
-      }
-    }
-
-  }
-
   const handleSearhValues = (v: Record<string, string>) => {
     const { searchValue, searchCategory } = v;
     if (searchValue != null) setSearchValue(searchValue);
@@ -148,6 +201,10 @@ function App() {
 
   return (
     <div className="App">
+      <div className="container-links">
+          <button disabled={isFirstPage()} onClick={(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => handleOffset(e)}>Previous</button>
+          <button disabled={isLastPage()} onClick={(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => handleOffset(e)}>Next</button>
+      </div>
       <Navigation 
         isFirstPage={isFirstPage()} 
         isLastPage={isLastPage()} 
@@ -157,7 +214,7 @@ function App() {
         handleSortBy={(v: string) => setSortBy(v)}
         handleSearch={(v: Record<string, string>) => handleSearhValues(v)}
         />
-      <div ref={cards} className="container-cards">
+      <div className="container-cards">
         {pokeData.length > 0 
         ? pokeData.map((pokemon, i) => 
           <Card key={`${pokemon.name}-${i}`} name={pokemon.name} weight={pokemon.weight} height={pokemon.height} abilities={pokemon.abilities} image={pokemon.image} />
@@ -165,7 +222,7 @@ function App() {
         : <p>Loading</p>}
       </div>
     
-      <div className="container-links-bottom">
+      <div className="container-links">
           <button disabled={isFirstPage()} onClick={(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => handleOffset(e)}>Previous</button>
           <button disabled={isLastPage()} onClick={(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => handleOffset(e)}>Next</button>
       </div>

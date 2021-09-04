@@ -1,8 +1,9 @@
-
 .container-navigation {
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  margin-top: .5rem;
+  flex-direction: row;
 }
 
 button {
@@ -13,16 +14,7 @@ button {
 }
 
 .container-navigation > div {
-  width: 33vw;
   display: flex;
-}
-
-.container-links {
-  justify-content: center;
-}
-
-.container-search {
-  justify-content: flex-end;
 }
 
 select {
@@ -32,4 +24,23 @@ select {
 
 select, input[type=text] {
   margin: 0 .5rem 0 .5rem;
+}
+
+@media screen and (max-width: 980px) {
+  .container-navigation {
+    flex-direction: column;
+  }
+  
+  .container-navigation > div {
+    margin: .5rem 0 .5rem;
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media screen and (max-width: 525px) {
+  .container-search > form {
+    display: flex;
+    flex-direction: column;
+  }
 }
